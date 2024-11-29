@@ -1,9 +1,10 @@
-import { Dinosaur, DinosaurModel } from "./types.ts";
+import { Vuelo, VueloModel } from "./types.ts";
 
-export const formModelToDinosaur = (dinosaurModel: DinosaurModel): Dinosaur => {
+export const formModelToVuelo = (vuelosModel: VueloModel): Vuelo => {
   return {
-    id: dinosaurModel._id!.toString(),
-    name: dinosaurModel.name,
-    type: dinosaurModel.type,
+    id: vuelosModel._id!.toString(),
+    origen: vuelosModel.origen,
+    destino: vuelosModel.destino,
+    date: vuelosModel.date
   };
 };

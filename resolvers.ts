@@ -1,70 +1,80 @@
 import { Collection, ObjectId } from "mongodb";
-import { Dinosaur, DinosaurModel } from "./types.ts";
-import { formModelToDinosaur } from "./utils.ts";
+import { Vuelo, VueloModel } from "./types.ts";
+import { formModelToVuelo } from "./utils.ts";
 
 export const resolvers = {
   Query: {
-    dinosaurs: async (
+    getFlights: async (
       _: unknown,
-      __: unknown,
-      context: { DinosaursCollection: Collection<DinosaurModel> },
-    ): Promise<Dinosaur[]> => {
-      const dinosaursModel = await context.DinosaursCollection.find().toArray();
-      return dinosaursModel.map((dinosaurModel) =>
-        formModelToDinosaur(dinosaurModel)
-      );
+      args: { origen?: string; destino?: string },
+      context: { VuelosCollection: Collection<VueloModel> },
+    ): Promise<Vuelo[]> => {
+      const { origen, destino } = args;
+
+      // Construye el filtro dinámicamente según los argumentos
+      const filter: Partial<VueloModel> = {};
+      if (origen) filter.origen = origen;
+      if (destino) filter.destino = destino;
+
+      // Consulta la base de datos usando el filtro
+      const vueloModel = await context.VuelosCollection.find(filter).toArray();
+
+      // Convierte los resultados a Vuelo y los retorna
+      return vueloModel.map((vueloModel) => formModelToVuelo(vueloModel));
     },
-    dinosaur: async (
+    getFlight: async (
       _: unknown,
       { id }: { id: string },
       context: {
-        DinosaursCollection: Collection<DinosaurModel>;
+        VuelosCollection: Collection<VueloModel>;
       },
-    ): Promise<Dinosaur | null> => {
-      const dinosaurModel = await context.DinosaursCollection.findOne({
+    ): Promise<Vuelo | null> => {
+      const vueloModel = await context.VuelosCollection.findOne({
         _id: new ObjectId(id),
       });
-      if (!dinosaurModel) {
+      if (!vueloModel) {
         return null;
       }
-      return formModelToDinosaur(dinosaurModel);
+      return formModelToVuelo(vueloModel);
     },
   },
   Mutation: {
-    addDinosaur: async (
+    addFlight: async (
       _: unknown,
-      args: { name: string; type: string },
+      args: { origen: string; destino: string; date: string },
       context: {
-        DinosaursCollection: Collection<DinosaurModel>;
+        VuelosCollection: Collection<VueloModel>;
       },
-    ): Promise<Dinosaur> => {
-      const { name, type } = args;
-      const { insertedId } = await context.DinosaursCollection.insertOne({
-        name,
-        type,
+    ): Promise<Vuelo> => {
+      const { origen, destino, date } = args;
+      const { insertedId } = await context.VuelosCollection.insertOne({
+        origen,
+        destino,
+        date,
       });
-      const dinosaurModel = {
+      const vueloModel = {
         _id: insertedId,
-        name,
-        type,
+        origen,
+        destino,
+        date,
       };
-      return formModelToDinosaur(dinosaurModel!);
+      return formModelToVuelo(vueloModel!);
     },
-    deleteDinosaur: async (
-      _: unknown,
-      args: { id: string },
-      context: {
-        DinosaursCollection: Collection<DinosaurModel>;
-      },
-    ): Promise<Dinosaur | null> => {
-      const id = args.id;
-      const dinosaurModel = await context.DinosaursCollection.findOneAndDelete({
-        _id: new ObjectId(id),
-      });
-      if (!dinosaurModel) {
-        return null;
-      }
-      return formModelToDinosaur(dinosaurModel);
-    },
+    // deleteDinosaur: async (
+    //   _: unknown,
+    //   args: { id: string },
+    //   context: {
+    //     DinosaursCollection: Collection<VueloModel>;
+    //   },
+    // ): Promise<Vuelo | null> => {
+    //   const id = args.id;
+    //   const dinosaurModel = await context.DinosaursCollection.findOneAndDelete({
+    //     _id: new ObjectId(id),
+    //   });
+    //   if (!dinosaurModel) {
+    //     return null;
+    //   }
+    //   return formModelToVuelo(dinosaurModel);
+    // },
   },
 };

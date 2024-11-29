@@ -1,17 +1,17 @@
 export const schema = `#graphql
-type Dinosaur {
+type Vuelo {
   id: ID!
-  name: String!
-  type: String!
+  origen: String!
+  destino: String!
+  date: String!
 }
 
 type Query {
-  dinosaurs: [Dinosaur!]!
-  dinosaur(id: ID!): Dinosaur
+  getFlights(origen: String, destino: String): [Vuelo!]!
+  getFlight(id: ID!): Vuelo
 }
 
 type Mutation {
-  addDinosaur(name: String!, type: String!): Dinosaur!
-  deleteDinosaur(id: ID!): Dinosaur
+  addFlight(origen: String!, destino: String!, date: String!): Vuelo!
 }
 `;

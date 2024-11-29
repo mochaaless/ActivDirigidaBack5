@@ -1,12 +1,14 @@
 import { OptionalId } from "mongodb";
 
-export type DinosaurModel = OptionalId<{
-  name: string;
-  type: string;
+export type VueloModel = OptionalId<{
+  origen: string;
+  destino: string
+  date: string;
 }>;
 
-export type Dinosaur = {
+export type Vuelo = {
   id: string;
-  name: string;
-  type: string;
+  origen: string;
+  destino: string
+  date: string;
 };
